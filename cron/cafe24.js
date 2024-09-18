@@ -9,13 +9,16 @@ import request from 'request';
 // Get Authentication Code
 // 토큰 발급 요청시 사용된 code는 재사용할 수 없으며 코드 발급 후 1분이 경과되면 만료됨.
 export async function getCode() {
-  const code = await axios.get(
+  const { data } = await axios.get(
     `https://${process.env.CAFE24_MALLID}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${process.env.CAFE24_CLIENT_ID}&state=a1b2c3d4&redirect_uri=${process.env.CAFE24_REDIRECT_URI}&scope=mall.read_order`
   );
-  console.log(code);
+  console.log(data);
 }
 
-export async function getAccessCode() {
+export async function getAccessToken() {
+  // 1. RefreshToken이 유효할 경우 AccessToken을 발급받는 프로세스
+  // 2. 발급받은 AccessToken, RefreshToken을 수정할 수 있는 프로세스
+  // 3. RefreshToken이 아예 만료된 경우 Code를 발급받아 프로세스 파일을 수정한 이후에 AccessToken, RefreshToken을 발급 받음.
   var payload = `grant_type=authorization_code&code=${process.env.CAFE24_CODE}&redirect_uri=${process.env.CAFE24_REDIRECT_URI}`;
   const encodedVal = base64encode(
     `${process.env.CAFE24_CLIENT_ID}:${process.env.CAFE24_CLIENT_SECRET_KEY}`

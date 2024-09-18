@@ -16,4 +16,4 @@ dotenv.config();
 //     }
 //   );
 // meta.getData();
-await getAccessCode();
+await getCode();
