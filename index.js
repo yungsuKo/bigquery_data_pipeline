@@ -1,29 +1,19 @@
-const express = require('express');
-const cron = require('node-cron');
-const meta = require('./cron/meta');
+import cron from 'node-cron';
+import dotenv from 'dotenv';
+// const meta = require('./cron/meta');
+import { getCode, getAccessCode } from './cron/cafe24.js';
 
-const app = express();
-require('dotenv').config();
+dotenv.config();
 
-const port = 3000;
-
-app.listen(port, () => {
-  console.log(`app is running on ${port}`);
-});
-
-let start = async () => {
-  //   let task_name = cron.schedule(
-  //     '* * * * * *',
-  //     () => {
-  //       meta.getData();
-  //     },
-  //     {
-  //       scheduled: false,
-  //       timezone: 'Asia/Seoul',
-  //     }
-  //   );
-  //   task_name.start();
-
-  meta.getData();
-};
-start();
+// cron.schedule(
+//     '* * * * * *',
+//     () => {
+//       meta.getData();
+//     },
+//     {
+//       scheduled: false,
+//       timezone: 'Asia/Seoul',
+//     }
+//   );
+// meta.getData();
+await getAccessCode();

@@ -11,9 +11,12 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/bigquery": "^7.5.2",
+    "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "node-cron": "^3.0.3"
+    "node-cron": "^3.0.3",
+    "nodejs-base64": "^2.0.0",
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
