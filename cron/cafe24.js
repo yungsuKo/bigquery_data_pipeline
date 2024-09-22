@@ -39,3 +39,11 @@ export async function getAccessToken() {
     console.log(body);
   });
 }
+
+export const getOrders = () => {
+  // cafe24 요청 방식
+};
+
+export const getOrderItems = () => {
+  // cafe24 요청 양식
+};
