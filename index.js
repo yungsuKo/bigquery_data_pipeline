@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import dotenv from 'dotenv';
 // const meta = require('./cron/meta');
-import { getCode, getAccessCode } from './cron/cafe24.js';
+import { getCode, getAccessToken } from './cron/cafe24.js';
 
 dotenv.config();
 
