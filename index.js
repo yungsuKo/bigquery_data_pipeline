@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import dotenv from 'dotenv';
 // const meta = require('./cron/meta');
 import { getCode, getAccessToken } from './cron/cafe24.js';
+import { createDataset } from './utils/saveBigquery.js';
 
 dotenv.config();
 
@@ -16,4 +17,4 @@ dotenv.config();
 //     }
 //   );
 // meta.getData();
-await getCode();
+await createDataset();
