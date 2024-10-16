@@ -10,6 +10,7 @@
       "member_email": "sample@sample.com",
       "member_authentication": "T",
       "initial_order_amount": {
+        // initial_order_amount - 최초 주문 금액으로 해석해야 하나?
         "order_price_amount": "5000.00",
         "shipping_fee": "14000.00",
         "points_spent_amount": "0.00",
