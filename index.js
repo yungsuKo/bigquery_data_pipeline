@@ -160,3 +160,34 @@ while (newday < today) {
 
 // url을 여기서 만들어
 // const products = await fetchData(url);
+
+/** 아래 함수는 order_id를 인자로 입력 받으면,
+ * 해당 order_id의 order_item을 빅쿼리에 추가함.
+ *
+ */
+async function insertOrderItem(order_id) {
+  const datasetName = 'cafe24';
+  const orderTableId = 'order_items';
+
+  const url = `https://${process.env.MALL_ID}.cafe24api.com/api/v2/admin/orders/${order_id}/items`;
+  let data = fetchDataVersion(url);
+
+  data = {
+    // data에서 저장할 데이터만 키 밸류 형식으로 저장
+  };
+
+  try {
+    await bigqueryClient.dataset(datasetName).table(orderTableId).insert(data);
+  } catch (error) {
+    console.error('Error inserting data:', error);
+    // 재시도 로직 추가
+    await sleep(1); // 1초 대기 후 재시도
+    return insertOrderItem(order_id);
+  }
+}
+
+// 과거 데이터를 전부 가져오기 위해 처리
+// 1초에 2회 호출하면 무제한 가져올 수 있음.
+// 일단 현재 가져온 order 개수는 362,302개로 50시간 정도 소요됨.
+// 벌크로 다운받을 수 있는 방법을 고려해보는게 나을 것 같다는 생각
+// 그러기 위해서는 우선 필드 정의부터 선행되어야 함.
