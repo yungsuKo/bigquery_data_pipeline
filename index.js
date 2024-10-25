@@ -182,7 +182,7 @@ async function getOrderId() {
         'BigQuery 프로젝트에 대한 권한이 없습니다. 프로젝트 권한을 확인하세요.'
       );
     }
-    throw error; // 오류를 상위로 전파하여 호출자가 처리할 수 있도록 함
+    throw error; // 오류를 상위로 전파하여 호출자가 처리할 수 있도록 ���
   }
 }
 
@@ -191,7 +191,7 @@ async function insertOrderItem(order_id) {
   const orderTableId = 'order_items';
 
   const url = `https://${process.env.MALL_ID}.cafe24api.com/api/v2/admin/orders/${order_id}/items`;
-  let data = fetchDataVersion(url);
+  let data = await fetchDataVersion(url);
 
   const orderItemData = [];
   data.items.map((item) => {
@@ -222,14 +222,19 @@ async function insertOrderItem(order_id) {
   });
 
   try {
+    // 업데이트가 안되고 계속 타입 관련 에러가 발생함
+    await bigqueryClient.query({
+      query: `
+        UPDATE \`${datasetName}.orders\`
+        SET flag = 1
+        WHERE order_id = FORMAT('%d', ${order_id})
+      `,
+      params: { orderId: order_id },
+    });
     await bigqueryClient
       .dataset(datasetName)
       .table(orderTableId)
       .insert(orderItemData);
-    await bigqueryClient
-      .dataset(datasetName)
-      .table('orders')
-      .update({ flag: 1 }, { filter: `order_id = ${order_id}` });
   } catch (error) {
     console.error('Error inserting data:', error);
     // 재시도 로직 추가
@@ -247,38 +252,38 @@ const bigqueryClient = new BigQuery(options);
 const orderData = await getOrderId();
 console.log(orderData);
 
-// async function processOrder(order, maxRetries = 3, delay = 1000) {
-//   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-//     try {
-//       await refreshToken();
-//       await insertOrderItem(order.order_id);
-//       console.log(`주문 처리 성공 (order_id: ${order.order_id})`);
-//       return; // 성공적으로 처리되면 함수 종료
-//     } catch (error) {
-//       console.error(
-//         `주문 처리 중 오류 발생 (order_id: ${order.order_id}, 시도: ${attempt}/${maxRetries}):`,
-//         error
-//       );
+async function processOrder(order, maxRetries = 3, delay = 1000) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await refreshToken();
+      await insertOrderItem(order.order_id);
+      console.log(`주문 처리 성공 (order_id: ${order.order_id})`);
+      return; // 성공적으로 처리되면 함수 종료
+    } catch (error) {
+      console.error(
+        `주문 처리 중 오류 발생 (order_id: ${order.order_id}, 시도: ${attempt}/${maxRetries}):`,
+        error
+      );
 
-//       if (attempt === maxRetries) {
-//         console.error(
-//           `최대 재시도 횟수 도달. 주문 처리 실패 (order_id: ${order.order_id})`
-//         );
-//       } else {
-//         console.log(`${delay / 1000}초 후 재시도...`);
-//         await new Promise((resolve) => setTimeout(resolve, delay));
-//       }
-//     }
-//   }
-// }
+      if (attempt === maxRetries) {
+        console.error(
+          `최대 재시도 횟수 도달. 주문 처리 실패 (order_id: ${order.order_id})`
+        );
+      } else {
+        console.log(`${delay / 1000}�� 후 재시도...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+}
 
-// async function processOrders() {
-//   for (const order of orderData) {
-//     await processOrder(order);
-//   }
-// }
+async function processOrders() {
+  for (const order of orderData) {
+    await processOrder(order);
+  }
+}
 
-// await processOrders();
+await processOrders();
 
 // 과거 데이터를 전부 가져오기 위해 처리
 // 1초에 2회 호출하면 무제한 가져올 수 있음.
